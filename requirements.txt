@@ -1,2 +1,2 @@
-Flask
-qrcode
+Flask 
+qrcode 
